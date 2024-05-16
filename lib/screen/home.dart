@@ -82,6 +82,8 @@ class LoginSection extends HookConsumerWidget {
       loading.value = false;
     }
 
+    final showPWd = useState(false);
+
     return Form(
       key: _key,
       child: Padding(
@@ -120,10 +122,17 @@ class LoginSection extends HookConsumerWidget {
                 }
                 return null;
               },
-              obscureText: true,
-              decoration: const InputDecoration(
+              obscureText: !showPWd.value,
+              decoration: InputDecoration(
+                suffixIcon: IconButton(
+                    onPressed: () {
+                      showPWd.value = !showPWd.value;
+                    },
+                    icon: Icon(showPWd.value
+                        ? Icons.visibility_off
+                        : Icons.remove_red_eye)),
                 filled: true,
-                labelText: 'Password',
+                labelText: 'Mot de passe',
               ),
             ),
             const SizedBox(height: 30),

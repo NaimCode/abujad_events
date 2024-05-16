@@ -1,7 +1,7 @@
 name: supmti_events
 description: "Une application pour scanner des QR codes et gérer des événements"
 publish_to: "none"
-version: 0.1.0+3
+version: 0.1.0+5
 
 environment:
   sdk: ">=3.3.0 <4.0.0"
