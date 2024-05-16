@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
@@ -56,9 +57,6 @@ class QrScanScreen extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, ref) {
-    var isMenuVisible = false;
-    var restaurantID = "";
-    Barcode? barcode;
     final controller = useState<QRViewController?>(null);
     final isLoading = useState(false);
     final api = ref.watch(apiProvider);
@@ -76,6 +74,8 @@ class QrScanScreen extends HookConsumerWidget {
 //   "message": "Ticket validated"
 // }
           if (response.data['status'] == 'success') {
+            FlutterRingtonePlayer().play(fromAsset: "assets/success_2.mp3");
+            await Future.delayed(const Duration(milliseconds: 700));
             await showDialog(
               // ignore: use_build_context_synchronously
               context: context,
@@ -96,8 +96,23 @@ class QrScanScreen extends HookConsumerWidget {
               },
             );
           } else {
-            showToast(
-                response.data['message'] as String? ?? 'Ticket non valide');
+            // showToast(
+            //   response.data['message'] as String? ?? 'Ticket non valide');
+
+            // ignore: use_build_context_synchronously
+            FlutterRingtonePlayer()
+                .play(fromAsset: "assets/cursor_error.mp3")
+                .whenComplete(() async {
+              await Future.delayed(const Duration(milliseconds: 700));
+              // ignore: use_build_context_synchronously
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                backgroundColor: Colors.red,
+                content: Text(
+                    response.data['message'] as String? ?? 'Ticket non valide'),
+                duration: const Duration(seconds: 3),
+              ));
+            });
+
             // showDialog(
             //   context: context,
             //   barrierDismissible: false,
@@ -128,6 +143,13 @@ class QrScanScreen extends HookConsumerWidget {
       isLoading.value = false;
     }
 
+    isLoading.addListener(() {
+      if (isLoading.value) {
+        controller.value?.pauseCamera();
+      } else {
+        controller.value?.resumeCamera();
+      }
+    });
     return Scaffold(
         appBar: AppBar(
           title: const Text('Scanner'),
@@ -185,11 +207,29 @@ class QrScanScreen extends HookConsumerWidget {
                     IconButton.filledTonal(
                         onPressed: () {
                           controller.value?.toggleFlash();
+                          //isLoading.value = true;
+                          // FlutterRingtonePlayer()
+                          //     .play(fromAsset: "assets/success_2.mp3")
+                          //     .whenComplete(() async {
+                          //   await Future.delayed(
+                          //       const Duration(milliseconds: 700));
+                          //   ScaffoldMessenger.of(context)
+                          //       .showSnackBar(const SnackBar(
+                          //     content: Text('Ticket non valide'),
+                          //     duration: Duration(seconds: 3),
+                          //   ));
+                          // });
+                          // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          //   content: Text(response.data['message'] as String? ??
+                          //       'Ticket non valide'),
+                          //   duration: const Duration(seconds: 3),
+                          // ));
                         },
                         icon: const Icon(Icons.flash_on_rounded)),
                     const SizedBox(width: 20),
                     IconButton.filledTonal(
                         onPressed: () {
+                          //isLoading.value = false;
                           controller.value?.flipCamera();
                         },
                         icon: const Icon(Icons.flip_camera_ios)),
@@ -204,7 +244,9 @@ class QrScanScreen extends HookConsumerWidget {
                   width: 30,
                   height: 30,
                   child: Center(
-                    child: CircularProgressIndicator(),
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               )

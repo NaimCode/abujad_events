@@ -13,6 +13,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_hooks: ^0.20.0
+  flutter_ringtone_player: ^4.0.0+2
   flutter_riverpod: ^2.4.9
   freezed_annotation: ^2.4.1
   go_router: ^14.1.0
@@ -41,6 +42,9 @@ dev_dependencies:
   json_serializable: ^6.7.1
 flutter:
   uses-material-design: true
+  assets:
+    - assets/
+    - assets/animations/
 
 flutter_launcher_icons:
   android: "launcher_icon"
@@ -48,7 +52,3 @@ flutter_launcher_icons:
   image_path: "assets/logo.png"
   min_sdk_android: 21
   remove_alpha_ios: true
-
-  assets:
-    - assets/
-    - assets/animations/
