@@ -1,22 +1,13 @@
-import 'package:abujad_events/utils/box.dart';
 import 'package:dio/dio.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
-
-String _baseUrlDevIOS = 'http://localhost:4000/api/v1';
-String _baseUrlDevAndroid = 'http://10.0.2.2:4000/api/v1';
-String _baseUrlProd = 'https://api.okeyo.ma/api/v1';
-String apiKey = 'app_nksjlskdosjdieur84y54hjsbjh293hrsugd8y843h45ih';
-
-String apiUrl = _baseUrlDevIOS;
+import 'package:supmti_events/utils/box.dart';
 
 final baseConfig = BaseOptions(
-  baseUrl: apiUrl,
   connectTimeout: const Duration(seconds: 30),
   receiveTimeout: const Duration(seconds: 30),
   headers: {
     'Accept': 'application/json',
-    'api-key': apiKey,
   },
 );
 

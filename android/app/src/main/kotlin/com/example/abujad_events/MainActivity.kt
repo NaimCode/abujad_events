@@ -1,4 +1,4 @@
-package com.example.abujad_events
+package com.events.isicod
 
 import io.flutter.embedding.android.FlutterActivity
 

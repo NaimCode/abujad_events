@@ -28,6 +28,31 @@
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Need microphone access for scanning QR</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>
+	 Abuja Events requires access to your location to provide you with the best possible experience. Please enable location services in your device settings.
+	</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>
+	 Abuja Events requires access to your location to provide you with the best possible experience. Please enable location services in your device settings.
+	</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>
+	 Abuja Events requires access to your location to provide you with the best possible experience. Please enable location services in your device settings.
+	</string>
+	
+	<key>UIApplicationSupportsIndirectInputEvents</key>
+	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>
+The app requires access to camera to enable user to take pictures and videos to use them as profile picture, videos and images for products, as well as shop logos and covers.
+</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>
+	The app requires access to photo library to enable user to upload various media types, including profile pictures, videos, and images of products, as well as shop logos and covers.
+	</string>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>

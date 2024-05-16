@@ -1,11 +1,11 @@
-import 'package:abujad_events/styles/colors.dart';
-import 'package:abujad_events/utils/api.dart';
-import 'package:abujad_events/utils/box.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lottie/lottie.dart';
 import 'package:oktoast/oktoast.dart';
+import 'package:supmti_events/styles/colors.dart';
+import 'package:supmti_events/utils/api.dart';
+import 'package:supmti_events/utils/box.dart';
 
 class Home extends HookConsumerWidget {
   const Home({super.key});
@@ -24,8 +24,10 @@ class Home extends HookConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Lottie.asset('assets/scan.json', width: 200),
-                    Text('ABUJAD',
+                    Lottie.network(
+                        'https://lottie.host/fde6aa22-c568-4ac6-92a1-cbc16a3339f3/KNcmz1uHcY.json',
+                        width: 200),
+                    Text('SUPMTI',
                         style: Theme.of(context)
                             .textTheme
                             .displayLarge!
@@ -66,12 +68,14 @@ class LoginSection extends HookConsumerWidget {
     Future<void> login() async {
       loading.value = true;
       try {
-        // final response = await api.post('/auth/login', data: {
-        //   'email': email.text,
-        //   'password': password.text,
-        // });
-        await Future.delayed(const Duration(seconds: 2));
-        await Box.setToken('test');
+        final response = await api.post(
+            'https://events-preprod.supmti.ac.ma/src/api/authentification.php',
+            data: {
+              'email': email.text,
+              'mot_de_passe': password.text,
+            });
+        final token = response.data['token'];
+        await Box.setToken(token);
       } catch (e) {
         showToast('Erreur de connexion, veuillez réessayer');
       }

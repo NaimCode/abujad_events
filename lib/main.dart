@@ -1,15 +1,15 @@
 import 'dart:async';
 
-import 'package:abujad_events/screen/home.dart';
-import 'package:abujad_events/screen/qr_code_screen.dart';
-import 'package:abujad_events/styles/colors.dart';
-import 'package:abujad_events/utils/box.dart' as b;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:oktoast/oktoast.dart';
+import 'package:supmti_events/screen/home.dart';
+import 'package:supmti_events/screen/qr_code_screen.dart';
+import 'package:supmti_events/styles/colors.dart';
+import 'package:supmti_events/utils/box.dart' as b;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
