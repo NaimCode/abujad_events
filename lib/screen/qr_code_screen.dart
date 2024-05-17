@@ -466,7 +466,7 @@ class QrScanScreen extends HookConsumerWidget {
         controller.scannedDataStream.listen((barcode) async {
           if (barcode.code != null) {
             if (barcode.code!.startsWith('#B')) {
-              await scan(barcode.code);
+              await scan(barcode.code?.trim());
             } else {
               showToast('Ticket non pris en charge');
             }
