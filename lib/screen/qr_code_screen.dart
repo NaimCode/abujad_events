@@ -353,7 +353,6 @@ class QrScanScreen extends HookConsumerWidget {
         appBar: AppBar(
           title: const Text('Scanner'),
           actions: [
-            TextButton(onPressed: () {}, child: const Text("Historique")),
             IconButton(
               icon: const Icon(Icons.logout),
               onPressed: () {
