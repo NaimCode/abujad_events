@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
+import 'package:hive_flutter/hive_flutter.dart' as b;
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
@@ -76,14 +77,41 @@ class QrScanScreen extends HookConsumerWidget {
           if (response.data['status'] == 'success') {
             FlutterRingtonePlayer().play(fromAsset: "assets/success_2.mp3");
             await Future.delayed(const Duration(milliseconds: 700));
+            final date = DateTime.now();
+            final formattedDate =
+                '${date.day}/${date.month}/${date.year} à ${date.hour}:${date.minute}';
+            b.Hive.box('history').add({
+              'code': code,
+              'status': 'success', // 'success' or 'error
+              'message': response.data['message'],
+              'date': formattedDate,
+            });
             await showDialog(
               // ignore: use_build_context_synchronously
               context: context,
               barrierDismissible: false,
               builder: (context) {
                 return AlertDialog(
-                  title: const Text('Code scanné'),
-                  content: Text(response.data['message'] ?? 'Ticket validé'),
+                  content: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.check_circle,
+                          color: Colors.green, size: 40),
+                      const SizedBox(height: 6),
+                      Text(
+                        response.data['message'] ?? 'Ticket validé',
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 10),
+                      Text('$code',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: Colors.grey,
+                            fontSize: 12,
+                          )),
+                    ],
+                  ),
                   actions: [
                     FilledButton.tonal(
                       onPressed: () {
@@ -100,18 +128,61 @@ class QrScanScreen extends HookConsumerWidget {
             //   response.data['message'] as String? ?? 'Ticket non valide');
 
             // ignore: use_build_context_synchronously
-            FlutterRingtonePlayer()
-                .play(fromAsset: "assets/cursor_error.mp3")
-                .whenComplete(() async {
+            try {
+              if (response.data['message'].toString().contains('token')) {
+                await Box.clearToken();
+              }
+            } catch (e) {}
+            try {
+              await FlutterRingtonePlayer()
+                  .play(fromAsset: "assets/cursor_error.mp3");
+
               await Future.delayed(const Duration(milliseconds: 700));
+              final date = DateTime.now();
+              // format to french date
+              final formattedDate =
+                  '${date.day}/${date.month}/${date.year} à ${date.hour}:${date.minute}';
+              b.Hive.box('history').add({
+                'code': code,
+                'status': 'error', // 'success' or 'error
+                'message': response.data['message'],
+                'date': formattedDate,
+              });
               // ignore: use_build_context_synchronously
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                action: SnackBarAction(
+                  label: 'X',
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                  },
+                ),
                 backgroundColor: Colors.red,
-                content: Text(
-                    response.data['message'] as String? ?? 'Ticket non valide'),
+                content: Row(
+                  children: [
+                    const Icon(Icons.error, color: Colors.white),
+                    const SizedBox(width: 6),
+                    Column(
+                      children: [
+                        Text(
+                          response.data['message'] as String? ??
+                              'Ticket non valide',
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '$code',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
                 duration: const Duration(seconds: 3),
               ));
-            });
+            } catch (e) {}
 
             // showDialog(
             //   context: context,
@@ -151,9 +222,138 @@ class QrScanScreen extends HookConsumerWidget {
       }
     });
     return Scaffold(
+        //history on floating action button
+
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            final histories =
+                b.Hive.box('history').values.toList().reversed.toList();
+            // final histories = [
+            //   {
+            //     'code': '#B123456789',
+            //     'status': 'success',
+            //     'message': 'Ticket validé',
+            //     'date': '2021-09-01T12:00:01Z',
+            //   },
+            //   {
+            //     'code': '#B123456789',
+            //     'status': 'error',
+            //     'message': 'Ticket non valide',
+            //     'date': '2021-09-01T12:00:00Z',
+            //   },
+            //   {
+            //     'code': '#B123456789',
+            //     'status': 'success',
+            //     'message': 'Ticket validé',
+            //     'date': '2021-09-01T12:00:00Z',
+            //   },
+            //   {
+            //     'code': '#B123456789',
+            //     'status': 'error',
+            //     'message': 'Ticket non valide',
+            //     'date': '2021-09-01T12:00:00Z',
+            //   },
+            //   {
+            //     'code': '#B123456789',
+            //     'status': 'success',
+            //     'message': 'Ticket validé',
+            //     'date': '2021-09-01T12:00:00Z',
+            //   },
+            //   {
+            //     'code': '#B123456789',
+            //     'status': 'error',
+            //     'message': 'Ticket non valide',
+            //     'date': '2021-09-01T12:00:00Z',
+            //   },
+            //   {
+            //     'code': '#B123456789',
+            //     'status': 'success',
+            //     'message': 'Ticket validé',
+            //     'date': '2021-09-01T12:00:00Z',
+            //   },
+            //   {
+            //     'code': '#B123456789',
+            //     'status': 'error',
+            //     'message': 'Ticket non valide',
+            //     'date': '2021-09-01T12:00:00Z',
+            //   },
+            //   {
+            //     'code': '#B123456789',
+            //     'status': 'success',
+            //     'message': 'Ticket validé',
+            //     'date': '2021-09-01T12:00:00Z',
+            //   },
+            //   {
+            //     'code': '#B123456789',
+            //     'status': 'error',
+            //     'message': 'Ticket non valide',
+            //     'date': '2021-09-01T12:00:00Z',
+            //   },
+            //   {
+            //     'code': '#B123456789',
+            //     'status': 'success',
+            //     'message': 'Ticket validé',
+            //     'date': '2021-09-01T12:00:00Z',
+            //   },
+            //   {
+            //     'code': '#B123456789',
+            //     'status': 'error',
+            //     'message': 'Ticket non valide',
+            //     'date': '2021-09-01T12:00:00Z',
+            //   },
+            // ].reversed.toList();
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => Scaffold(
+                  appBar: AppBar(
+                    title: const Text('Historique'),
+                  ),
+                  body: histories.isEmpty
+                      ? const Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.history, size: 60),
+                              SizedBox(height: 20),
+                              Text('Aucun historique'),
+                            ],
+                          ),
+                        )
+                      : ListView.separated(
+                          separatorBuilder: (context, index) =>
+                              const Divider(height: 0),
+                          itemCount: histories.length,
+                          itemBuilder: (context, index) {
+                            final history = histories[index];
+                            return ListTile(
+                              leading: Icon(
+                                history['status'] == 'success'
+                                    ? Icons.check_circle
+                                    : Icons.error,
+                                color: history['status'] == 'success'
+                                    ? primaryColor
+                                    : Colors.red,
+                              ),
+                              tileColor: history['status'] == 'success'
+                                  ? null
+                                  : Colors.red.withOpacity(0.1),
+                              title: Text(history['code'] as String),
+                              subtitle: Text(history['message'] as String),
+                              trailing: Text(history['date'] as String),
+                            );
+                          },
+                        ),
+                ),
+              ),
+            );
+          },
+          child: const Icon(Icons.history),
+        ),
         appBar: AppBar(
           title: const Text('Scanner'),
           actions: [
+            TextButton(onPressed: () {}, child: const Text("Historique")),
             IconButton(
               icon: const Icon(Icons.logout),
               onPressed: () {
@@ -198,7 +398,7 @@ class QrScanScreen extends HookConsumerWidget {
               ),
             ),
             Positioned(
-                bottom: 60,
+                bottom: 100,
                 left: 0,
                 right: 0,
                 child: Row(
@@ -207,6 +407,8 @@ class QrScanScreen extends HookConsumerWidget {
                     IconButton.filledTonal(
                         onPressed: () {
                           controller.value?.toggleFlash();
+
+                          // ignore
                           //isLoading.value = true;
                           // FlutterRingtonePlayer()
                           //     .play(fromAsset: "assets/success_2.mp3")
